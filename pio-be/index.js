@@ -225,36 +225,27 @@ async function analyzePlant(imageBase64) {
   // 2. Gemini AI 클라이언트 초기화
   const ai = new GoogleGenerativeAI(apiKey);
 
-  // 3. 요청 데이터 구성
-  const contents = [
-    {
-      role: 'user',
-      parts: [
-        { text: PLANT_ANALYSIS_PROMPT },
-        {
-          inlineData: {
-            mimeType: 'image/jpeg',
-            data: imageBase64,
-          },
-        },
-      ],
+  // 3. 모델 설정
+  const model = ai.getGenerativeModel({ 
+    model: GEMINI_CONFIG.model,
+    generationConfig: {
+      temperature: GEMINI_CONFIG.temperature,
+      topK: GEMINI_CONFIG.topK,
+      topP: GEMINI_CONFIG.topP,
     },
-  ];
-
-  const config = {
-    temperature: GEMINI_CONFIG.temperature,
-    topK: GEMINI_CONFIG.topK,
-    topP: GEMINI_CONFIG.topP,
-  };
+  });
 
   try {
-    // 4. AI 분석 요청
-    const model = ai.getGenerativeModel({ 
-      model: GEMINI_CONFIG.model,
-      generationConfig: config,
-    });
-    
-    const response = await model.generateContent(contents);
+    // 4. AI 분석 요청 - parts 배열로 직접 전달
+    const response = await model.generateContent([
+      PLANT_ANALYSIS_PROMPT,
+      {
+        inlineData: {
+          mimeType: 'image/jpeg',
+          data: imageBase64,
+        },
+      },
+    ]);
 
     // 5. 응답 텍스트 추출
     const aiResponse = await response.response;
