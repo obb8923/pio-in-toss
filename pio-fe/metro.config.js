@@ -1,13 +1,15 @@
-const { getDefaultConfig } = require('metro-config');
+const { getDefaultConfig } = require("metro-config");
 
 module.exports = (async () => {
-  const config = await getDefaultConfig();
-  
+  const {
+    resolver: { sourceExts, assetExts }
+  } = await getDefaultConfig();
+
   return {
-    ...config,
     resolver: {
-      ...config.resolver,
-      platforms: ['ios', 'android', 'native', 'web'],
-    },
+      assetExts,
+      sourceExts,
+      platforms: ["ios", "android", "native", "web"],
+    }
   };
 })();
