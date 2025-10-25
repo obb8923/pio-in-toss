@@ -139,11 +139,11 @@ app.use(
  */
 async function analyzePlant(imageBuffer) {
   // 1. API 키 확인
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.AI_API_KEY;
 
   if (!apiKey) {
-    console.error('FATAL: GEMINI_API_KEY is not configured');
-    throw new Error('GEMINI_API_KEY not configured');
+    console.error('FATAL: AI_API_KEY is not configured');
+    throw new Error('AI_API_KEY not configured');
   }
 
   // 2. Gemini AI 클라이언트 초기화
@@ -392,7 +392,7 @@ app.use((err, _req, res, _next) => {
 // 서버 시작
 // ============================================
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3001;
 
 if (require.main === module) {
   app.listen(PORT, () => {
