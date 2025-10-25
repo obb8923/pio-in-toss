@@ -1,16 +1,14 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { 
-  launchImageLibrary, 
-  launchCamera, 
-  ImagePickerResponse, 
-  MediaType, 
-  PhotoQuality 
-} from 'react-native-image-picker';
+  openCamera, 
+  fetchAlbumPhotos, 
+  ImageResponse 
+} from '@apps-in-toss/framework';
+import { usePermissionGate } from './usePermissionGate';
 
 interface UseImagePickerOptions {
-  quality?: PhotoQuality;
-  includeBase64?: boolean;
+  base64?: boolean;
 }
 
 interface UseImagePickerReturn {
@@ -26,50 +24,76 @@ export const useImagePicker = (
   const [isProcessing, setIsProcessing] = useState(false);
 
   const defaultOptions = {
-    quality: 0.8 as PhotoQuality,
-    includeBase64: true,
+    base64: true,
     ...options,
   };
 
-  const handleImagePickerResponse = async (response: ImagePickerResponse) => {
+  const cameraPermissionGate = usePermissionGate({
+    getPermission: () => openCamera.getPermission(),
+    openPermissionDialog: () => openCamera.openPermissionDialog(),
+    onPermissionRequested: (status) => console.log(`카메라 권한 요청 결과: ${status}`),
+  });
+
+  const albumPermissionGate = usePermissionGate({
+    getPermission: () => fetchAlbumPhotos.getPermission(),
+    openPermissionDialog: () => fetchAlbumPhotos.openPermissionDialog(),
+    onPermissionRequested: (status) => console.log(`앨범 권한 요청 결과: ${status}`),
+  });
+
+  const handleImageResponse = async (response: ImageResponse | ImageResponse[] | undefined) => {
     setIsProcessing(false);
     
-    if (response.didCancel || response.errorMessage) {
-      console.log('이미지 선택 취소 또는 오류:', response.errorMessage);
+    if (!response) {
+      console.log('이미지 선택 취소');
       return;
     }
 
-    const asset = response.assets?.[0];
-    if (!asset?.base64) {
+    // fetchAlbumPhotos는 배열을 반환하므로 첫 번째 이미지만 사용
+    const imageData = Array.isArray(response) ? response[0] : response;
+    
+    if (!imageData?.dataUri) {
       Alert.alert('오류', '이미지 데이터를 가져올 수 없습니다.');
       return;
     }
 
     try {
-      onImageSelected(asset.base64);
+      const base64Data = defaultOptions.base64 
+        ? imageData.dataUri 
+        : `data:image/jpeg;base64,${imageData.dataUri}`;
+      onImageSelected(base64Data);
     } catch (error) {
       console.error('이미지 처리 중 오류:', error);
       Alert.alert('오류', '이미지 처리 중 오류가 발생했습니다.');
     }
   };
 
-  const selectFromGallery = () => {
+  const selectFromGallery = useCallback(async () => {
     setIsProcessing(true);
-    const pickerOptions = {
-      mediaType: 'photo' as MediaType,
-      ...defaultOptions,
-    };
-    launchImageLibrary(pickerOptions, handleImagePickerResponse);
-  };
+    try {
+      const response = await albumPermissionGate.ensureAndRun(() =>
+        fetchAlbumPhotos({ maxWidth: 360, base64: defaultOptions.base64 })
+      );
+      await handleImageResponse(response);
+    } catch (error) {
+      setIsProcessing(false);
+      console.error('갤러리 선택 중 오류:', error);
+      Alert.alert('오류', '갤러리에서 이미지를 선택할 수 없습니다.');
+    }
+  }, [albumPermissionGate, defaultOptions.base64]);
 
-  const takePhoto = () => {
+  const takePhoto = useCallback(async () => {
     setIsProcessing(true);
-    const pickerOptions = {
-      mediaType: 'photo' as MediaType,
-      ...defaultOptions,
-    };
-    launchCamera(pickerOptions, handleImagePickerResponse);
-  };
+    try {
+      const response = await cameraPermissionGate.ensureAndRun(() =>
+        openCamera({ base64: defaultOptions.base64 })
+      );
+      await handleImageResponse(response);
+    } catch (error) {
+      setIsProcessing(false);
+      console.error('카메라 촬영 중 오류:', error);
+      Alert.alert('오류', '카메라로 사진을 촬영할 수 없습니다.');
+    }
+  }, [cameraPermissionGate, defaultOptions.base64]);
 
   return {
     isProcessing,

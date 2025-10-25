@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import { AnalyzeImageResponse } from '../types/analysis';
 
 interface UseImageAnalysisOptions {
@@ -14,7 +13,7 @@ interface UseImageAnalysisReturn {
 }
 
 // 임시 분석 함수 (실제 백엔드 API로 교체 예정)
-const analyzeImage = async (imageBase64: string): Promise<AnalyzeImageResponse> => {
+const analyzeImage = async (_imageBase64: string): Promise<AnalyzeImageResponse> => {
   // 실제 백엔드 API 호출로 교체할 예정
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -56,7 +55,7 @@ export const useImageAnalysis = ({
         error: "이미지 분석 중 오류가 발생했습니다."
       };
       setAnalysisResult(errorResult);
-      onError?.(errorResult.error);
+      onError?.(errorResult.error || "이미지 분석 중 오류가 발생했습니다.");
     } finally {
       setIsAnalyzing(false);
     }

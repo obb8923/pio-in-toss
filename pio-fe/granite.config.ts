@@ -13,8 +13,14 @@ export default defineConfig({
         bridgeColorMode: 'basic',
       },
       permissions: [
-        'NSCameraUsageDescription',
-        'NSPhotoLibraryUsageDescription',
+        {
+          name: 'camera',
+          access: 'access',
+        },
+        {
+          name: 'photos',
+          access: 'read',
+        },
       ],
     }),
   ],
