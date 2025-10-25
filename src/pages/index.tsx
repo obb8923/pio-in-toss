@@ -1,7 +1,9 @@
 import { createRoute } from '@granite-js/react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { launchImageLibrary, launchCamera, ImagePickerResponse, MediaType, PhotoQuality } from 'react-native-image-picker';
+import { View, Text } from 'react-native';
+import { Button } from '../components/common/Button';
+import { useImagePicker } from '../hooks/useImagePicker';
+import { styles } from '../styles/common';
 
 export const Route = createRoute('/', {
   component: Page,
@@ -14,155 +16,40 @@ function Page() {
     navigation.navigate('/about');
   };
 
-  const handleImagePickerResponse = async (response: ImagePickerResponse) => {
-    if (response.didCancel || response.errorMessage) {
-      console.log('이미지 선택 취소 또는 오류:', response.errorMessage);
-      return;
-    }
-
-    const asset = response.assets?.[0];
-    if (!asset?.base64) {
-      Alert.alert('오류', '이미지 데이터를 가져올 수 없습니다.');
-      return;
-    }
-
-    try {
-      // 분석 화면으로 이동하면서 base64 데이터 전달
-      (navigation as any).navigate('/analyze', { imageBase64: asset.base64 });
-    } catch (error) {
-      console.error('이미지 처리 중 오류:', error);
-      Alert.alert('오류', '이미지 처리 중 오류가 발생했습니다.');
-    }
+  const handleImageSelected = (base64: string) => {
+    (navigation as any).navigate('/analyze', { imageBase64: base64 });
   };
 
-  const selectFromGallery = () => {
-    const options = {
-      mediaType: 'photo' as MediaType,
-      quality: 0.8 as PhotoQuality,
-      includeBase64: true,
-    };
-
-    launchImageLibrary(options, handleImagePickerResponse);
-  };
-
-  const takePhoto = () => {
-    const options = {
-      mediaType: 'photo' as MediaType,
-      quality: 0.8 as PhotoQuality,
-      includeBase64: true,
-    };
-
-    launchCamera(options, handleImagePickerResponse);
-  };
+  const { selectFromGallery, takePhoto } = useImagePicker(handleImageSelected);
 
   return (
-    <View style={{
-      flex: 1,
-      backgroundColor: '#ef4444',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 16,
-    }}>
-      <Text style={{
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: '#1f2937',
-        textAlign: 'center',
-        marginBottom: 16,
-      }}>
+    <View style={[styles.container, styles.mainContainer]}>
+      <Text style={[styles.welcomeTitle, styles.textPrimary, styles.textCenter]}>
         🎉 Welcome! 🎉
       </Text>
-      <Text style={{
-        fontSize: 18,
-        color: '#4b5563',
-        textAlign: 'center',
-        marginBottom: 24,
-      }}>
+      <Text style={[styles.welcomeSubtitle, styles.textMuted, styles.textCenter]}>
         식물 인식 AI로 식물을 분석해보세요
       </Text>
       
-      <TouchableOpacity 
-        style={{
-          backgroundColor: '#10b981',
-          paddingVertical: 12,
-          paddingHorizontal: 32,
-          borderRadius: 8,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
-          marginBottom: 16,
-        }}
+      <Button
+        title="📷 갤러리에서 선택"
+        variant="success"
+        style={styles.buttonSpacing}
         onPress={selectFromGallery}
-      >
-        <Text style={{
-          color: '#ffffff',
-          fontSize: 18,
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}>
-          📷 갤러리에서 선택
-        </Text>
-      </TouchableOpacity>
+      />
 
-      <TouchableOpacity 
-        style={{
-          backgroundColor: '#059669',
-          paddingVertical: 12,
-          paddingHorizontal: 32,
-          borderRadius: 8,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
-          marginBottom: 24,
-        }}
+      <Button
+        title="📸 카메라로 찍기"
+        variant="info"
+        style={styles.lastButtonSpacing}
         onPress={takePhoto}
-      >
-        <Text style={{
-          color: '#ffffff',
-          fontSize: 18,
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}>
-          📸 카메라로 찍기
-        </Text>
-      </TouchableOpacity>
+      />
 
-      <TouchableOpacity 
-        style={{
-          backgroundColor: '#2563eb',
-          paddingVertical: 12,
-          paddingHorizontal: 32,
-          borderRadius: 8,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
-        }}
+      <Button
+        title="About 페이지로 이동"
+        variant="primary"
         onPress={goToAboutPage}
-      >
-        <Text style={{
-          color: '#ffffff',
-          fontSize: 18,
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}>
-          About 페이지로 이동
-        </Text>
-      </TouchableOpacity>
+      />
     </View>
   );
 }
