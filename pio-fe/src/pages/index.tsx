@@ -49,7 +49,10 @@ function Page() {
     <Background isInsetTop={true} isInsetBottom={false}>
       {/* 앱정보 버튼 */}
       <View style={{position:'absolute',top: 16,right: 0,left:0 ,flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal: 16}}>
-      <View style={{width:45}}/>
+      <View style={{width:54}}/>
+      {/* <Button display="block" size="tiny" style="weak" onPress={() => setSelectedImageBase64(null)}>
+          초기화
+        </Button> */}
         <Text typography='t5' color={colors.grey900} style={{textAlign:'center',flex:1}}>
           식물 이름 찾기는 피오!
         </Text>
@@ -75,20 +78,20 @@ function Page() {
       <Blur innerStyle={{paddingHorizontal:16}} style={{minWidth:123,maxWidth:333,height:53,borderWidth:6,borderColor: colors.background,borderRadius:10000,position:'absolute',top: 196,left: 0}}>
         {selectedImageBase64 ? (
           isAnalyzing ? (
-            <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1}>
+            <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1} fontWeight='semibold'>
               분석 중...
             </Text>
           ) : analysisResult && analysisResult.code === 'success' ? (
-            <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1}>
+            <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1} fontWeight='semibold'>
               {analysisResult.name}
             </Text>
           ) : (
-            <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1}>
+            <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1} fontWeight='semibold'>
               분석 실패
             </Text>
           )
         ) : (
-          <Text typography='t5' color={colors.grey900} style={{textAlign:'center'}} numberOfLines={1}>
+          <Text typography='t5' color={colors.grey700} style={{textAlign:'center'}} numberOfLines={1} fontWeight='semibold'>
             식물 이름
           </Text>
         )}
@@ -122,7 +125,7 @@ function Page() {
           <></>
         )
       ) : (
-        <Text typography='t5' color={colors.grey900} style={{textAlign:'left',width:'100%'}}>
+        <Text typography='t5' color={colors.grey700} style={{textAlign:'left',width:'100%'}}>
           {`아래 버튼을 눌러서 식물을 사진을 선택해주세요\n궁금했던 식물의 이름과 설명을 확인할 수 있어요!`}
         </Text>
       )}
