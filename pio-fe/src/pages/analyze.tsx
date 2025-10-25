@@ -30,7 +30,7 @@ function Page() {
   const imageHeight = 240;
   const borderRadius = 16;
   return (
-    <Background isStatusBarGap={false} isTabBarGap={false}>
+    <Background isInsetTop={true} isInsetBottom={true}>
       {/* 사진 영역 */}
       <View style={{ position: 'absolute', top: 16, left: 0, right: 0, marginBottom: 6, width: '100%', height: imageHeight,paddingHorizontal: 8 }}>
         <Image

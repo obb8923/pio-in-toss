@@ -20,6 +20,7 @@
     "react-native-image-picker": "^8.2.1",
     "react-native-reanimated": "^4.1.3",
     "react-native-url-polyfill": "^3.0.0",
+    "react-native-vector-icons": "^10.3.0",
     "zustand": "^5.0.8"
   },
   "overrides": {
@@ -37,6 +38,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.2",
     "@types/react": "18.3.3",
+    "@types/react-native-vector-icons": "^6.4.18",
     "babel-preset-granite": "0.1.28",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
