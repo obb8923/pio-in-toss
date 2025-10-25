@@ -1,19 +1,64 @@
 import 'react-native-url-polyfill/auto'; // URL polyfill 필요
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@env';
+import { config } from '../config/env';
 
-
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+if (!config.supabase.url || !config.supabase.anonKey) {
   throw new Error('Supabase URL 또는 Anon Key가 설정되지 않았습니다.');
 }
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+// AsyncStorage가 제대로 작동하는지 확인하고 fallback 제공
+const createStorage = () => {
+  // AsyncStorage가 사용 가능한지 확인
+  if (AsyncStorage && typeof AsyncStorage.getItem === 'function') {
+    return {
+      getItem: async (key: string) => {
+        try {
+          return await AsyncStorage.getItem(key);
+        } catch (error) {
+          console.warn('AsyncStorage getItem error:', error);
+          return null;
+        }
+      },
+      setItem: async (key: string, value: string) => {
+        try {
+          await AsyncStorage.setItem(key, value);
+        } catch (error) {
+          console.warn('AsyncStorage setItem error:', error);
+        }
+      },
+      removeItem: async (key: string) => {
+        try {
+          await AsyncStorage.removeItem(key);
+        } catch (error) {
+          console.warn('AsyncStorage removeItem error:', error);
+        }
+      },
+    };
+  } else {
+    // AsyncStorage가 사용 불가능한 경우 메모리 스토리지 사용
+    console.warn('AsyncStorage is not available, using memory storage');
+    const memoryStorage: { [key: string]: string } = {};
+    return {
+      getItem: async (key: string) => memoryStorage[key] || null,
+      setItem: async (key: string, value: string) => {
+        memoryStorage[key] = value;
+      },
+      removeItem: async (key: string) => {
+        delete memoryStorage[key];
+      },
+    };
+  }
+};
+
+const storage = createStorage();
+
+export const supabase = createClient(config.supabase.url, config.supabase.anonKey, {
   auth: {
-    storage: AsyncStorage, // 세션 유지용 세션 데이터를 저장할 저장소 지정, React Native 환경에서는 AsyncStorage 사용
+    storage: storage, // 커스텀 스토리지 래퍼 사용
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,// React Native에서는 일반적으로 false로 설정합니다.
+    detectSessionInUrl: false, // React Native에서는 일반적으로 false로 설정합니다.
   },
 }); 
 
