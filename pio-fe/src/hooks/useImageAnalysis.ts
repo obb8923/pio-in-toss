@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnalyzeImageResponse } from '../types/analysis';
+import { config } from '../config/env';
 
 interface UseImageAnalysisOptions {
   imageBase64: string;
@@ -12,22 +13,34 @@ interface UseImageAnalysisReturn {
   performAnalysis: () => Promise<void>;
 }
 
-// 임시 분석 함수 (실제 백엔드 API로 교체 예정)
-const analyzeImage = async (_imageBase64: string): Promise<AnalyzeImageResponse> => {
-  // 실제 백엔드 API 호출로 교체할 예정
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 임시 더미 데이터
-      resolve({
-        code: "success",
-        name: "몬스테라",
-        type_code: "indoor",
-        description: "몬스테라는 아름다운 잎사귀를 가진 인기 있는 실내 식물입니다. 공기 정화 효과가 뛰어나며 관리가 쉬워 초보자에게도 추천됩니다.",
-        activity_notes: "봄과 여름에 활발하게 자라며, 겨울에는 성장이 둔화됩니다. 충분한 간접광을 제공하고 토양이 마르면 물을 주세요.",
-        activity_curve: [0.2, 0.3, 0.6, 0.8, 0.9, 0.9, 0.8, 0.7, 0.5, 0.3, 0.2, 0.1]
-      });
-    }, 2000); // 2초 지연
-  });
+// 실제 백엔드 API 호출 함수
+const analyzeImage = async (imageBase64: string): Promise<AnalyzeImageResponse> => {
+  try {
+    // 이미지 데이터가 data:image/jpeg;base64, 형식인지 확인
+    const base64Data = imageBase64.startsWith('data:') 
+      ? imageBase64 
+      : `data:image/jpeg;base64,${imageBase64}`;
+    
+    const response = await fetch(`${config.api.baseUrl}/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image: base64Data
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API 호출 실패: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('API 호출 중 오류:', error);
+    throw error;
+  }
 };
 
 export const useImageAnalysis = ({

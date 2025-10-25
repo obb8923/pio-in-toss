@@ -1,14 +1,14 @@
 import {
   AI_API_KEY,
+  BE_ENDPOINT_URL,
 } from '@env';
 
 export const config = {
   ai: {
     apiKey: AI_API_KEY,
   },
-  // 다른 백엔드 API 설정을 여기에 추가할 수 있습니다
   api: {
-    baseUrl: process.env.API_BASE_URL || 'https://your-api.com',
+    baseUrl: BE_ENDPOINT_URL || 'http://localhost:8080',
     timeout: 10000,
   },
 };

@@ -13,7 +13,7 @@
 const express = require('express');
 const cors = require('cors');
 const Busboy = require('busboy');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 
@@ -127,6 +127,9 @@ app.use(
   }),
 );
 
+// JSON body parser 추가
+app.use(express.json({ limit: '10mb' }));
+
 // ============================================
 // AI 식물 분석 함수
 // ============================================
@@ -147,41 +150,23 @@ async function analyzePlant(imageBuffer) {
   }
 
   // 2. Gemini AI 클라이언트 초기화
-  const ai = new GoogleGenAI({
-    apiKey,
-  });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
   // 3. 요청 데이터 구성
-  const contents = [
-    {
-      role: 'user',
-      parts: [
-        { text: PLANT_PROMPT },
-        {
-          inlineData: {
-            mimeType: 'image/jpeg',
-            data: imageBuffer.toString('base64'),
-          },
-        },
-      ],
+  const imagePart = {
+    inlineData: {
+      mimeType: 'image/jpeg',
+      data: imageBuffer.toString('base64'),
     },
-  ];
+  };
 
   // 4. AI 분석 요청
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents,
-  });
+  const result = await model.generateContent([PLANT_PROMPT, imagePart]);
+  const response = await result.response;
 
   // 5. 응답 텍스트 추출
-  let resultText = '';
-  if (response.candidates && response.candidates[0]?.content?.parts) {
-    for (const part of response.candidates[0].content.parts) {
-      if (part.text) {
-        resultText += part.text;
-      }
-    }
-  }
+  const resultText = response.text();
 
   // 6. JSON 파싱
   try {
@@ -324,24 +309,37 @@ function receiveImage(req) {
  */
 app.post('/analyze', async (req, res) => {
   try {
-    // 1. Content-Type 검증
     const contentType = req.headers['content-type'] || '';
+    let fileBuffer = null;
 
-    if (!contentType.toLowerCase().includes('multipart/form-data')) {
-      throw new HttpError(400, 'Content-Type must be multipart/form-data.');
+    // JSON 형태의 Base64 데이터 처리
+    if (contentType.toLowerCase().includes('application/json')) {
+      const { image } = req.body;
+      
+      if (!image) {
+        throw new HttpError(400, 'No image provided');
+      }
+
+      // Base64 데이터를 Buffer로 변환
+      const base64Data = image.replace(/^data:image\/[a-z]+;base64,/, '');
+      fileBuffer = Buffer.from(base64Data, 'base64');
+    }
+    // multipart/form-data 처리
+    else if (contentType.toLowerCase().includes('multipart/form-data')) {
+      fileBuffer = await receiveImage(req);
+      
+      if (!fileBuffer) {
+        throw new HttpError(400, 'No image provided');
+      }
+    }
+    else {
+      throw new HttpError(400, 'Content-Type must be multipart/form-data or application/json.');
     }
 
-    // 2. 이미지 파일 추출
-    const fileBuffer = await receiveImage(req);
-
-    if (!fileBuffer) {
-      throw new HttpError(400, 'No image provided');
-    }
-
-    // 3. AI 식물 분석
+    // AI 식물 분석
     const result = await analyzePlant(fileBuffer);
 
-    // 4. 성공 응답
+    // 성공 응답
     res.json(result);
   } catch (error) {
     // 5. 에러 로깅
@@ -392,11 +390,11 @@ app.use((err, _req, res, _next) => {
 // 서버 시작
 // ============================================
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`서버가 0.0.0.0:${PORT}에서 실행 중입니다.`);
   });
 }
 
@@ -404,5 +402,5 @@ if (require.main === module) {
 // Export
 // ============================================
 
-module.exports = app;
+exports.plantAnalysis = app;
 
