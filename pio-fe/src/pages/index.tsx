@@ -1,5 +1,4 @@
 import { createRoute } from '@granite-js/react-native';
-import React from 'react';
 import { View } from 'react-native';
 import { Button } from '@toss/tds-react-native';
 import { useImagePicker } from '../hooks/useImagePicker';
@@ -21,11 +20,11 @@ function Page() {
   };
 
   const { selectFromGallery, takePhoto } = useImagePicker(handleImageSelected);
-
+  
+ 
   return (
     <Background isStatusBarGap={false} isTabBarGap={false}>
     <View style={{flex:1, justifyContent:'center', alignItems:'center', gap: 12, paddingHorizontal: 20}}>
-     
       <Button
         display="block"
         onPress={selectFromGallery}

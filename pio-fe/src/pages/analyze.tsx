@@ -32,7 +32,7 @@ function Page() {
   return (
     <Background isStatusBarGap={false} isTabBarGap={false}>
       {/* 사진 영역 */}
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, marginBottom: 6, width: '100%', height: imageHeight,paddingHorizontal: 8 }}>
+      <View style={{ position: 'absolute', top: 16, left: 0, right: 0, marginBottom: 6, width: '100%', height: imageHeight,paddingHorizontal: 8 }}>
         <Image
           source={{ uri: `data:image/jpeg;base64,${routeParams.imageBase64}` }}
           style={{ width: '100%', height: '100%', borderRadius: borderRadius }}
@@ -40,7 +40,7 @@ function Page() {
         />
       </View>
       <ScrollView
-        style={{ flex: 1, paddingTop: imageHeight + 16, paddingHorizontal: 8, paddingBottom: 8, borderRadius: borderRadius }}
+        style={{ flex: 1, paddingTop: imageHeight + 32, paddingHorizontal: 8, paddingBottom: 8, borderRadius: borderRadius }}
         contentContainerStyle={{ paddingBottom: Platform.OS === "ios" ? 100 : 400 }}
         showsVerticalScrollIndicator={false}
       >

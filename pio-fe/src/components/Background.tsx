@@ -16,7 +16,7 @@ export const Background = ({children,isStatusBarGap=false,type='green',isTabBarG
   return (
     <View style={{ flex: 1 }}>
       <View
-        style={{ backgroundColor: colors.grey100, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        style={{ backgroundColor: colors.grey200, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       />
     {type === 'white' && <View style={{ flex: 1, marginHorizontal: 2, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'white', opacity: 0.9 }}/>}
     <View 
