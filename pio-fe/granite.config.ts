@@ -12,7 +12,10 @@ export default defineConfig({
         icon: 'https://cdn.pixabay.com/photo/2023/07/25/12/40/water-8149055_1280.jpg', // 화면에 노출될 앱의 아이콘 이미지 주소로 바꿔주세요.
         bridgeColorMode: 'basic',
       },
-      permissions: [],
+      permissions: [
+        'NSCameraUsageDescription',
+        'NSPhotoLibraryUsageDescription',
+      ],
     }),
   ],
 });
