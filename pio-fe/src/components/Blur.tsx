@@ -1,6 +1,7 @@
 import { BlurView } from '@granite-js/react-native';
 import { View,ViewStyle ,Platform} from 'react-native';
 import { colors } from '@toss/tds-react-native';
+
 export const Blur = ({children,style,innerStyle}: {children?: React.ReactNode,style?:ViewStyle,innerStyle?:ViewStyle}) => {
   const isIOS = Platform.OS === 'ios';
   if(isIOS){

@@ -1,6 +1,6 @@
 import { createRoute } from '@granite-js/react-native';
 import React, { useState } from 'react';
-import { View, Image, Alert, ActivityIndicator, ScrollView, Platform } from 'react-native';
+import { View, Image, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { Button, colors, Text } from '@toss/tds-react-native';
 import { useImagePicker } from '../hooks/useImagePicker';
 import { useImageAnalysis } from '../hooks/useImageAnalysis';
@@ -46,9 +46,12 @@ function Page() {
   }, [analysisResult, selectedImageBase64]);
   
   return (
-    <Background isInsetTop={true} isInsetBottom={false}>
-      {/* 앱정보 버튼 */}
-      <View style={{position:'absolute',top: 16,right: 0,left:0 ,flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal: 16}}>
+    <Background isInsetTop={false} isInsetBottom={false} type='green'>
+     
+      {/* 전체 컨테이너 */}
+      <View style={{ flex: 1,justifyContent:'space-between',alignItems:'center'}}>
+         {/* 헤더 - 앱 이름 및 앱정보 버튼 */}
+      <View style={{backgroundColor: colors.background, flexDirection:'row',justifyContent:'space-between',alignItems:'center',padding: 16}}>
       <View style={{width:54}}/>
       {/* <Button display="block" size="tiny" style="weak" onPress={() => setSelectedImageBase64(null)}>
           초기화
@@ -60,8 +63,6 @@ function Page() {
             앱 정보
       </Button>
       </View>
-      {/* 전체 컨테이너 */}
-      <View style={{ flex: 1,justifyContent:'space-between',alignItems:'center'}}>
       <View style={{ padding: 16,width: '90%',maxHeight: '80%',justifyContent:'center',alignItems:'center',backgroundColor: colors.background,borderTopLeftRadius:96,borderTopRightRadius:96,borderBottomLeftRadius:20,borderBottomRightRadius:20}}>
               {/* 사진 영역 */}
       <View style={{width:'100%',aspectRatio:6/4,maxHeight: 240,backgroundColor: colors.grey200,overflow: 'hidden',borderTopLeftRadius:96,borderTopRightRadius:96,borderBottomLeftRadius:20,borderBottomRightRadius:20}}>
@@ -100,7 +101,7 @@ function Page() {
         style={{ width: '100%',marginTop: 24,borderRadius:20}}
         contentContainerStyle={{ 
           paddingTop: 8,
-          paddingBottom: Platform.OS === "ios" ? 100 : 400,
+          paddingBottom: 32,
           justifyContent: 'center',
           alignItems: 'center'
         }}
@@ -144,7 +145,6 @@ function Page() {
           paddingHorizontal: 20,
           paddingTop: 16,
           paddingBottom: insets.bottom + 16,
-          backgroundColor: colors.background
         }}>
            <Button display="block" size="large" onPress={takePhoto}> 
             카메라로 찍기
