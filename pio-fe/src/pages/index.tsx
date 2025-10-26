@@ -145,6 +145,7 @@ function Page() {
           paddingHorizontal: 20,
           paddingTop: 16,
           paddingBottom: insets.bottom + 16,
+          backgroundColor: colors.background
         }}>
            <Button display="block" size="large" onPress={takePhoto}> 
             카메라로 찍기

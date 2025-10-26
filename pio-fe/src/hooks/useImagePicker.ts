@@ -71,7 +71,7 @@ export const useImagePicker = (
     setIsProcessing(true);
     try {
       const response = await albumPermissionGate.ensureAndRun(() =>
-        fetchAlbumPhotos({ maxWidth: 360, base64: defaultOptions.base64 })
+        fetchAlbumPhotos({ maxCount: 1, maxWidth: 1920, base64: defaultOptions.base64 })
       );
       await handleImageResponse(response);
     } catch (error) {
