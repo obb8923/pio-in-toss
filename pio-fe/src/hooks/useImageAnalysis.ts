@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { AnalyzeImageResponse } from '../types/analysis';
-import { BE_ENDPOINT_URL } from '../constants/normal';
 interface UseImageAnalysisOptions {
   imageBase64: string;
   onError?: (error: string) => void;
@@ -14,6 +13,7 @@ interface UseImageAnalysisReturn {
 
 // 실제 백엔드 API 호출 함수
 const analyzeImage = async (imageBase64: string): Promise<AnalyzeImageResponse> => {
+  const BE_ENDPOINT_URL = 'https://pio-957741045904.asia-northeast3.run.app';
   try {
     // 이미지 데이터가 data:image/jpeg;base64, 형식인지 확인
     const base64Data = imageBase64.startsWith('data:') 
