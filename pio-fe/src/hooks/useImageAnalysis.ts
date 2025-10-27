@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnalyzeImageResponse } from '../types/analysis';
-import { config } from '../config/env';
-
+import { BE_ENDPOINT_URL } from '../constants/normal';
 interface UseImageAnalysisOptions {
   imageBase64: string;
   onError?: (error: string) => void;
@@ -21,7 +20,7 @@ const analyzeImage = async (imageBase64: string): Promise<AnalyzeImageResponse> 
       ? imageBase64 
       : `data:image/jpeg;base64,${imageBase64}`;
     
-    const response = await fetch(`${config.api.baseUrl}/analyze`, {
+    const response = await fetch(`${BE_ENDPOINT_URL}/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

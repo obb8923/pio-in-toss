@@ -71,7 +71,7 @@ export const useImagePicker = (
     setIsProcessing(true);
     try {
       const response = await albumPermissionGate.ensureAndRun(() =>
-        fetchAlbumPhotos({ maxCount: 1, maxWidth: 1920, base64: defaultOptions.base64 })
+        fetchAlbumPhotos({ maxCount: 1, maxWidth: 1280, base64: defaultOptions.base64 })
       );
       await handleImageResponse(response);
     } catch (error) {
@@ -85,7 +85,7 @@ export const useImagePicker = (
     setIsProcessing(true);
     try {
       const response = await cameraPermissionGate.ensureAndRun(() =>
-        openCamera({ base64: defaultOptions.base64 })
+        openCamera({ maxWidth: 1280, base64: defaultOptions.base64 })
       );
       await handleImageResponse(response);
     } catch (error) {
