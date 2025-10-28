@@ -1,6 +1,7 @@
 import { createRoute } from '@granite-js/react-native';
 import React, { useState } from 'react';
-import { View, Image, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { useDialog } from '@toss/tds-react-native';
 import { Button, colors, Text } from '@toss/tds-react-native';
 import { useImagePicker } from '../hooks/useImagePicker';
 import { useImageAnalysis } from '../hooks/useImageAnalysis';
@@ -20,6 +21,7 @@ function Page() {
   const goToAboutPage = () => {
     navigation.navigate('/about');
   };
+  const dialog = useDialog();
 
   const handleImageSelected = (base64: string) => {
     setSelectedImageBase64(base64);
@@ -30,18 +32,22 @@ function Page() {
   const { isAnalyzing, analysisResult } = useImageAnalysis({
     imageBase64: selectedImageBase64 ?? '',
     onError: (error) => {
-      Alert.alert('오류', error, [
-        { text: '확인', onPress: () => setSelectedImageBase64(null) }
-      ]);
+      dialog.openAlert({
+        title: '오류',
+        description: String(error),
+      });
+      setSelectedImageBase64(null);
     }
   });
   
   React.useEffect(() => {
     if (!selectedImageBase64) return;
     if (analysisResult && analysisResult.code !== 'success' && analysisResult.code !== 'error') {
-      Alert.alert('분석 결과', analysisResult.error ?? '식물로 인식되지 않았어요.', [
-        { text: '확인', onPress: () => setSelectedImageBase64(null) }
-      ]);
+      dialog.openAlert({
+        title: '분석 결과',
+        description: analysisResult.error ?? '식물로 인식되지 않았어요.',
+      });
+      setSelectedImageBase64(null);
     }
   }, [analysisResult, selectedImageBase64]);
   

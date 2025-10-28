@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Alert } from 'react-native';
 import { 
   openCamera, 
   fetchAlbumPhotos, 
   ImageResponse 
 } from '@apps-in-toss/framework';
+import { useDialog } from '@toss/tds-react-native';
 import { usePermissionGate } from './usePermissionGate';
 
 interface UseImagePickerOptions {
@@ -22,6 +22,7 @@ export const useImagePicker = (
   options: UseImagePickerOptions = {}
 ): UseImagePickerReturn => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const dialog = useDialog();
 
   const defaultOptions = {
     base64: true,
@@ -52,7 +53,7 @@ export const useImagePicker = (
     const imageData = Array.isArray(response) ? response[0] : response;
     
     if (!imageData?.dataUri) {
-      Alert.alert('오류', '이미지 데이터를 가져올 수 없습니다.');
+      dialog.openAlert({ title: '오류', description: '이미지 데이터를 가져올 수 없습니다.' });
       return;
     }
 
@@ -63,7 +64,7 @@ export const useImagePicker = (
       onImageSelected(base64Data);
     } catch (error) {
       console.error('이미지 처리 중 오류:', error);
-      Alert.alert('오류', '이미지 처리 중 오류가 발생했습니다.');
+      dialog.openAlert({ title: '오류', description: '이미지 처리 중 오류가 발생했습니다.' });
     }
   };
 
@@ -77,7 +78,7 @@ export const useImagePicker = (
     } catch (error) {
       setIsProcessing(false);
       console.error('갤러리 선택 중 오류:', error);
-      Alert.alert('오류', '갤러리에서 이미지를 선택할 수 없습니다.');
+      dialog.openAlert({ title: '오류', description: '갤러리에서 이미지를 선택할 수 없습니다.' });
     }
   }, [albumPermissionGate, defaultOptions.base64]);
 
@@ -91,7 +92,7 @@ export const useImagePicker = (
     } catch (error) {
       setIsProcessing(false);
       console.error('카메라 촬영 중 오류:', error);
-      Alert.alert('오류', '카메라로 사진을 촬영할 수 없습니다.');
+      dialog.openAlert({ title: '오류', description: '카메라로 사진을 촬영할 수 없습니다.' });
     }
   }, [cameraPermissionGate, defaultOptions.base64]);
 
