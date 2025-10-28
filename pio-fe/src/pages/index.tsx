@@ -5,6 +5,7 @@ import { generateHapticFeedback } from '@apps-in-toss/framework';
 import { useDialog } from '@toss/tds-react-native';
 import { Button, colors, Text } from '@toss/tds-react-native';
 import { useImagePicker } from '../hooks/useImagePicker';
+import { compressBase64WithCanvas } from '../utils/canvasCompress';
 import { useImageAnalysis } from '../hooks/useImageAnalysis';
 import { Background } from '../components/Background';
 // import { Line } from '../components/Line';
@@ -17,7 +18,8 @@ export const Route = createRoute('/', {
 
 function Page() {
   const navigation = Route.useNavigation();
-  const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null);
+  const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null); // 원본 표시용
+  const [uploadImageBase64, setUploadImageBase64] = useState<string | null>(null); // 전송용(압축)
   const insets = useSafeAreaInsets();
   const goToAboutPage = () => {
     generateHapticFeedback({ type: 'tap' });
@@ -25,14 +27,17 @@ function Page() {
   };
   const dialog = useDialog();
 
-  const handleImageSelected = (base64: string) => {
+  const handleImageSelected = async (base64: string) => {
     setSelectedImageBase64(base64);
+    // 전송용은 캔버스로 리사이즈/압축
+    const compressed = await compressBase64WithCanvas(base64.replace(/^data:image\/jpeg;base64,/, ''));
+    setUploadImageBase64(compressed);
   };
 
   const { selectFromGallery, takePhoto } = useImagePicker(handleImageSelected);
 
   const { isAnalyzing, analysisResult } = useImageAnalysis({
-    imageBase64: selectedImageBase64 ?? '',
+    imageBase64: uploadImageBase64 ?? '',
     onError: (error) => {
       dialog.openAlert({
         title: '오류',

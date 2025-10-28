@@ -10,8 +10,8 @@ const app = express();
 
 // === 상수 정의 ===
 
-// JSON 페이로드 최대 크기 (15MB - base64 인코딩으로 인한 오버헤드 고려)
-const MAX_JSON_SIZE = '15mb';
+// JSON 페이로드 최대 크기 상향 (대용량 이미지 허용)
+const MAX_JSON_SIZE = '50mb';
 
 // Gemini AI 모델 설정
 const GEMINI_CONFIG = {
@@ -290,14 +290,17 @@ app.post('/analyze', async (req, res) => {
 
     // 2. Base64 데이터 추출
     const base64Data = extractBase64(image);
+    
+    // 2-1. 수신 이미지 크기 로그 출력
+    const base64Len = base64Data.length;
+    const padding = (base64Data.endsWith('==') ? 2 : base64Data.endsWith('=') ? 1 : 0);
+    const estimatedBytes = Math.max(0, Math.floor((base64Len * 3) / 4) - padding);
+    const estimatedMB = (estimatedBytes / (1024 * 1024)).toFixed(2);
+    console.log(
+      `[Analyze] Received image | origin=${req.headers.origin ?? 'unknown'} | base64Length=${base64Len} | estimatedBytes=${estimatedBytes} | estimatedMB=${estimatedMB} | ts=${new Date().toISOString()}`
+    );
 
-    // 3. 이미지 크기 간단 검증 (base64는 대략 원본의 1.33배)
-    const estimatedBytes = (base64Data.length * 3) / 4;
-    const maxBytes = 10 * 1024 * 1024; // 10MB
-
-    if (estimatedBytes > maxBytes) {
-      throw new HttpError(413, 'Image too large. Maximum size is 10MB');
-    }
+    // 3. 이미지 크기 검증 제거: 백엔드에서 별도 크기 제한을 두지 않음 (업스트림 서비스 한도만 따름)
 
     // 4. AI 분석 실행
     const result = await analyzePlant(base64Data);
