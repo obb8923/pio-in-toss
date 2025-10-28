@@ -133,7 +133,7 @@ function Page() {
         )
       ) : (
         <Text typography='t5' color={colors.grey700} style={{textAlign:'left',width:'100%'}}>
-          {`아래 버튼을 눌러서 식물을 사진을 선택해주세요\n궁금했던 식물의 이름과 설명을 확인할 수 있어요!`}
+          {`아래 버튼을 눌러서 식물을 사진을 선택해주세요\n궁금했던 식물의 이름과 설명을 확인할 수 있어요`}
         </Text>
       )}
      
