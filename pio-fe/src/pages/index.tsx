@@ -119,7 +119,7 @@ function Page() {
           <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}>
             <ActivityIndicator size="large" color={colors.green600} />
             <Text typography='t5' color={colors.grey600} style={{ marginTop: 16, textAlign: 'center' }}>
-              식물을 분석하고 있습니다..!
+              식물을 분석하고 있습니다
             </Text>
           </View>
         ) : analysisResult && analysisResult.code === 'success' ? (
