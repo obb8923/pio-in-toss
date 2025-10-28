@@ -1,6 +1,7 @@
 import { createRoute } from '@granite-js/react-native';
 import React, { useState } from 'react';
 import { View, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { generateHapticFeedback } from '@apps-in-toss/framework';
 import { useDialog } from '@toss/tds-react-native';
 import { Button, colors, Text } from '@toss/tds-react-native';
 import { useImagePicker } from '../hooks/useImagePicker';
@@ -19,6 +20,7 @@ function Page() {
   const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
   const goToAboutPage = () => {
+    generateHapticFeedback({ type: 'tap' });
     navigation.navigate('/about');
   };
   const dialog = useDialog();
@@ -39,6 +41,7 @@ function Page() {
       setSelectedImageBase64(null);
     }
   });
+  const lastAnalysisCodeRef = React.useRef<string | null>(null);
   
   React.useEffect(() => {
     if (!selectedImageBase64) return;
@@ -50,6 +53,20 @@ function Page() {
       setSelectedImageBase64(null);
     }
   }, [analysisResult, selectedImageBase64]);
+  
+  React.useEffect(() => {
+    if (!selectedImageBase64) return;
+    if (isAnalyzing) return;
+    const code = analysisResult?.code ?? null;
+    if (!code) return;
+    if (lastAnalysisCodeRef.current === code) return;
+    lastAnalysisCodeRef.current = code;
+    if (code === 'success') {
+      generateHapticFeedback({ type: 'success' });
+    } else {
+      generateHapticFeedback({ type: 'error' });
+    }
+  }, [analysisResult, isAnalyzing, selectedImageBase64]);
   
   return (
     <Background isInsetTop={false} isInsetBottom={false} type='green'>
@@ -153,10 +170,10 @@ function Page() {
           paddingBottom: insets.bottom + 16,
           backgroundColor: colors.background
         }}>
-           <Button display="block" size="large" onPress={takePhoto}> 
+          <Button display="block" size="large" onPress={() => { generateHapticFeedback({ type: 'tap' }); takePhoto(); }}> 
             카메라로 찍기
           </Button>
-          <Button display="block" size="large" onPress={selectFromGallery}>        
+          <Button display="block" size="large" onPress={() => { generateHapticFeedback({ type: 'tap' }); selectFromGallery(); }}>        
             갤러리에서 선택
           </Button>
         </View>

@@ -1,22 +1,20 @@
 import { createRoute, useNavigation } from '@granite-js/react-native';
 import React from 'react';
-import {  View, TouchableOpacity, ScrollView, Linking, Image,Platform } from 'react-native';
-import { share, generateHapticFeedback } from '@apps-in-toss/framework';
+import {  View, ScrollView, Image } from 'react-native';
+import { generateHapticFeedback } from '@apps-in-toss/framework';
 import { Text, colors ,Button} from '@toss/tds-react-native';
 import { Background } from '../components/Background';
-import { APPSTORE_URL, GOOGLEPLAY_URL } from '../constants/normal';
 export const Route = createRoute('/about', {
   component: Page,
 });
 
 function Page() {
   const navigation = useNavigation();
-
   return (
     <Background isInsetTop={false} isInsetBottom={false}>
       <View style={{flex:1}}>
         <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',padding:16}}>
-          <Button display="block" size="tiny" style="weak" onPress={() => navigation.goBack()}>
+          <Button display="block" size="tiny" style="weak" onPress={() => { generateHapticFeedback({ type: 'tap' }); navigation.goBack(); }}>
             {'<'}
           </Button>
         <Text typography='t4' color={colors.grey900} style={{textAlign:'center'}}>
@@ -52,10 +50,9 @@ function Page() {
           </View>
 
           
-          <View 
+          {/* <View 
           style={{ borderRadius: 16, overflow: 'hidden', backgroundColor: colors.background, borderWidth: 1, borderColor: colors.grey200 }}
           >
-            {/* 앱스토어로 이동 */}
             <TouchableOpacity
               onPress={() => Platform.OS === 'ios' ? Linking.openURL(APPSTORE_URL) : Linking.openURL(GOOGLEPLAY_URL)}
               style={{ padding: 16 }} activeOpacity={0.7}>
@@ -69,7 +66,6 @@ function Page() {
             </TouchableOpacity>
             <View style={{ height: 1, backgroundColor: colors.grey200 }} />
 
-            {/* 공유하기 */}
             <TouchableOpacity
               onPress={async () => {
                 try {
@@ -92,7 +88,7 @@ function Page() {
                 <Text typography='t5' color={colors.grey400}>{'›'}</Text>
               </View>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
       </View>
     </Background>
