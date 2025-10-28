@@ -1,6 +1,7 @@
 import { createRoute } from '@granite-js/react-native';
 import React, { useState } from 'react';
-import { View, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { View, ActivityIndicator, ScrollView } from 'react-native';
+import { Animated } from 'react-native';
 import { generateHapticFeedback } from '@apps-in-toss/framework';
 import { useDialog } from '@toss/tds-react-native';
 import { Button, colors, Text } from '@toss/tds-react-native';
@@ -21,6 +22,7 @@ function Page() {
   const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null); // 원본 표시용
   const [uploadImageBase64, setUploadImageBase64] = useState<string | null>(null); // 전송용(압축)
   const insets = useSafeAreaInsets();
+  const imageOpacity = React.useRef(new Animated.Value(0)).current;
   const goToAboutPage = () => {
     generateHapticFeedback({ type: 'tap' });
     navigation.navigate('/about');
@@ -58,6 +60,11 @@ function Page() {
       setSelectedImageBase64(null);
     }
   }, [analysisResult, selectedImageBase64]);
+
+  // 새 이미지가 선택될 때마다 페이드인 초기화
+  React.useEffect(() => {
+    imageOpacity.setValue(0);
+  }, [selectedImageBase64]);
   
   React.useEffect(() => {
     if (!selectedImageBase64) return;
@@ -95,7 +102,17 @@ function Page() {
               {/* 사진 영역 */}
       <View style={{width:'100%',aspectRatio:6/4,maxHeight: 240,backgroundColor: colors.grey200,overflow: 'hidden',borderTopLeftRadius:96,borderTopRightRadius:96,borderBottomLeftRadius:20,borderBottomRightRadius:20}}>
         {selectedImageBase64 ? (
-        <Image source={{ uri: `data:image/jpeg;base64,${selectedImageBase64}` }} style={{ width: '100%', height: '100%' }} />
+        <Animated.Image 
+          source={{ uri: `data:image/jpeg;base64,${selectedImageBase64}` }} 
+          style={{ width: '100%', height: '100%', opacity: imageOpacity }}
+          onLoadEnd={() => {
+            Animated.timing(imageOpacity, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }).start();
+          }}
+        />
         ) : (
         <View style={{width:'100%',height:'100%',justifyContent:'center',alignItems:'center'}}>
           <Text typography='t5' color={colors.grey600} style={{textAlign:'center'}}>
