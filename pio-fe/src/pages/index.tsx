@@ -1,5 +1,5 @@
 import { createRoute } from '@granite-js/react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator, ScrollView } from 'react-native';
 import { Animated } from 'react-native';
 import { generateHapticFeedback } from '@apps-in-toss/framework';
@@ -50,7 +50,7 @@ function Page() {
   });
   const lastAnalysisCodeRef = React.useRef<string | null>(null);
   
-  React.useEffect(() => {
+  useEffect(() => {
     if (!selectedImageBase64) return;
     if (analysisResult && analysisResult.code !== 'success' && analysisResult.code !== 'error') {
       dialog.openAlert({
@@ -62,11 +62,11 @@ function Page() {
   }, [analysisResult, selectedImageBase64]);
 
   // 새 이미지가 선택될 때마다 페이드인 초기화
-  React.useEffect(() => {
+  useEffect(() => {
     imageOpacity.setValue(0);
   }, [selectedImageBase64]);
   
-  React.useEffect(() => {
+  useEffect(() => {
     if (!selectedImageBase64) return;
     if (isAnalyzing) return;
     const code = analysisResult?.code ?? null;
